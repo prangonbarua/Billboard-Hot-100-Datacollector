@@ -2,20 +2,13 @@
 from flask import Flask, render_template, request, send_file, flash, redirect, url_for
 import os
 import pandas as pd
-from werkzeug.utils import secure_filename
 import tempfile
 
 app = Flask(__name__)
 app.secret_key = 'billboard_hot_100_secret_key_change_in_production'
 
-# Configuration
-UPLOAD_FOLDER = tempfile.gettempdir()
-ALLOWED_EXTENSIONS = {'csv'}
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100MB max file size
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+# Billboard Hot 100 data URL (public dataset)
+BILLBOARD_DATA_URL = 'https://raw.githubusercontent.com/HipsterVizNinja/random-data/main/Music/hot-100-current.csv'
 
 def process_billboard_data(csv_path, artist_name):
     """Process Billboard data and return Excel file path"""
@@ -89,24 +82,9 @@ def analyze():
         flash('Please enter an artist name', 'error')
         return redirect(url_for('index'))
 
-    # Check if file is uploaded or use default path
-    csv_path = '/Users/prangonbarua/Desktop/hot100.csv'
-
-    if 'csv_file' in request.files:
-        file = request.files['csv_file']
-        if file and file.filename != '' and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            csv_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(csv_path)
-
-    # Check if CSV file exists
-    if not os.path.exists(csv_path):
-        flash('CSV file not found. Please upload a file or make sure hot100.csv is on your Desktop.', 'error')
-        return redirect(url_for('index'))
-
     try:
-        # Process the data
-        output_file, error = process_billboard_data(csv_path, artist_name)
+        # Process the data using online dataset
+        output_file, error = process_billboard_data(BILLBOARD_DATA_URL, artist_name)
 
         if error:
             flash(error, 'error')
