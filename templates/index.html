@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billboard Hot 100 Chart Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Billboard Hot 100 Chart Analyzer</h1>
+            <p class="subtitle">Generate Excel chart history for any artist</p>
+        </header>
+
+        <div class="card">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('analyze') }}" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="artist_name">Artist Name</label>
+                    <input
+                        type="text"
+                        id="artist_name"
+                        name="artist_name"
+                        placeholder="e.g., Taylor Swift, Drake, The Weeknd"
+                        required
+                        autofocus
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="csv_file">Upload CSV File (Optional)</label>
+                    <p class="help-text">If not uploaded, will use hot100.csv from your Desktop</p>
+                    <input
+                        type="file"
+                        id="csv_file"
+                        name="csv_file"
+                        accept=".csv"
+                    >
+                </div>
+
+                <button type="submit" class="btn-primary">
+                    Generate Chart History
+                </button>
+            </form>
+        </div>
+
+        <div class="info-section">
+            <h2>How It Works</h2>
+            <ol>
+                <li>Enter the artist name you want to analyze</li>
+                <li>Optionally upload a Billboard Hot 100 CSV file (or use the default from Desktop)</li>
+                <li>Click "Generate Chart History" to create your Excel file</li>
+                <li>Download the generated Excel file with complete chart history</li>
+            </ol>
+
+            <h3>Data Format</h3>
+            <p>The CSV file should contain these columns: <strong>Date</strong>, <strong>Song</strong>, <strong>Artist</strong>, <strong>Rank</strong></p>
+        </div>
+
+        <footer>
+            <p>Billboard Hot 100 Chart Analyzer | Created with Python & Flask</p>
+        </footer>
+    </div>
+</body>
+</html>
