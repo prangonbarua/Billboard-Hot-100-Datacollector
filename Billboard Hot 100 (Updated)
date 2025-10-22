@@ -2,10 +2,10 @@ import os
 import pandas as pd
 
 # === PARAMETERS TO EDIT ===
-artist_name = 'Calvin Harris'  # ← enter the artist name here
+artist_name = 'Taylor Swift'  # ← enter the artist name here
 
-# Use os.path.expanduser to safely handle your home directory
-file_path = os.path.expanduser('~/Desktop/hot100.csv')
+# Direct path with your username
+file_path = '/Users/prangonbarua/Desktop/hot100.csv'
 # ===========================
 
 # Load the data
@@ -27,12 +27,18 @@ if required_cols.issubset(data.columns):
 
     if not filtered_data.empty:
         # Create a 'Song (Artist)' column
+        filtered_data = filtered_data.copy()
         filtered_data['Song_Artist'] = (
             filtered_data['Song'].str.title() + " (" + filtered_data['Artist'].str.title() + ")"
         )
 
         # Pivot table using actual dates from the data (not artificially generated)
-        pivot_table = filtered_data.pivot(index='Date', columns='Song_Artist', values='Rank')
+        pivot_table = filtered_data.pivot_table(
+            index='Date', 
+            columns='Song_Artist', 
+            values='Rank',
+            aggfunc='first'
+        )
 
         # Fill in missing weeks (only those present in the data)
         all_dates = pd.Series(data['Date'].unique())
@@ -50,8 +56,8 @@ if required_cols.issubset(data.columns):
         # Safe filename for output
         safe_name = artist_name.title().replace(" ", "_")
         
-        # Output file path (Desktop of current user)
-        output_file = os.path.expanduser(f'~/Desktop/{safe_name}_Chart_History.xlsx')
+        # Output file path to Desktop
+        output_file = f'/Users/prangonbarua/Desktop/{safe_name}_Chart_History.xlsx'
 
         # Save to Excel (requires openpyxl installed)
         pivot_table.to_excel(output_file)
